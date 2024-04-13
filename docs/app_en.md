@@ -45,5 +45,3 @@
 - This prevents campaign tasks from being shot in vain.
 - In addition to this, the deposited tokens are used to pay for gas for issuing points (tokens).
 - It is expected that the speed of the aptos chain would allow for almost real-time token issuance.
-
-Translated with www.DeepL.com/Translator (free version)
