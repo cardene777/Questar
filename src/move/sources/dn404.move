@@ -1,4 +1,4 @@
-module quest_star_addr::db404 {
+module questar_addr::db404 {
     use std::error;
     use std::option::{Self, Option};
     use std::string::String;
@@ -6,7 +6,7 @@ module quest_star_addr::db404 {
     use aptos_framework::object::{Self, DeleteRef, ExtendRef, Object, ObjectCore};
     use aptos_token_objects::property_map;
     use aptos_token_objects::token;
-    use quest_star_addr::quest_star_token;
+    use questar_addr::questar_token;
 
     const APP_OBJECT_SEED: vector<u8> = b"QUICK STAR";
 
@@ -20,11 +20,11 @@ module quest_star_addr::db404 {
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     /// Storage state for managing the no-code Collection.
-    struct QuestStarCollection has key {
+    struct QuestarCollection has key {
         mint_count: u64,
     }
 
-    struct QuestStarCollectionLive has key {
+    struct QuestarCollectionLive has key {
         live: bool,
     }
 

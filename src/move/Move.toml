@@ -1,13 +1,13 @@
 [package]
-name = 'quest_star'
+name = 'questar'
 version = '1.0.0'
 upgrade_policy = "compatible"
 
 [addresses]
-quest_star_addr = '0x1f3dfe4bd7c58129960609006c32bc6dd6cd24d5b0fbf091780e29c5360dca48'
+questar_addr = '0x1f3dfe4bd7c58129960609006c32bc6dd6cd24d5b0fbf091780e29c5360dca48'
 
 [dev-addresses]
-quest_star_addr = '0x1f3dfe4bd7c58129960609006c32bc6dd6cd24d5b0fbf091780e29c5360dca48'
+questar_addr = '0x1f3dfe4bd7c58129960609006c32bc6dd6cd24d5b0fbf091780e29c5360dca48'
 
 [dependencies.AptosFramework]
 git = 'https://github.com/aptos-labs/aptos-core.git'

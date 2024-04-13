@@ -1,4 +1,4 @@
-module quest_star_addr::quest_star_token {
+module questar_addr::questar_token {
     use std::error;
     use std::option::{Self, Option};
     use std::string::String;
@@ -24,7 +24,7 @@ module quest_star_addr::quest_star_token {
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     /// Storage state for managing the no-code Collection.
-    struct QuestStarCollection has key {
+    struct QuestarCollection has key {
         /// Used to mutate collection fields
         mutator_ref: Option<collection::MutatorRef>,
         /// Used to mutate royalties
@@ -49,7 +49,7 @@ module quest_star_addr::quest_star_token {
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     /// Storage state for managing the no-code Token.
-    struct QuestStarToken has key {
+    struct QuestarToken has key {
         /// Used to burn.
         burn_ref: Option<token::BurnRef>,
         /// Used to control freeze.
@@ -116,7 +116,7 @@ module quest_star_addr::quest_star_token {
         tokens_freezable_by_creator: bool,
         royalty_numerator: u64,
         royalty_denominator: u64,
-    ): Object<QuestStarCollection> {
+    ): Object<QuestarCollection> {
         let creator_addr = signer::address_of(creator);
         let royalty = royalty::create(royalty_numerator, royalty_denominator, creator_addr);
         let constructor_ref = collection::create_fixed_collection(
@@ -141,7 +141,7 @@ module quest_star_addr::quest_star_token {
             option::none()
         };
 
-        let aptos_collection = QuestStarCollection {
+        let aptos_collection = QuestarCollection {
             mutator_ref,
             royalty_mutator_ref,
             mutable_description,
@@ -167,7 +167,7 @@ module quest_star_addr::quest_star_token {
         property_keys: vector<String>,
         property_types: vector<String>,
         property_values: vector<vector<u8>>,
-    ) acquires QuestStarCollection, QuestStarToken {
+    ) acquires QuestarCollection, QuestarToken {
         mint_token_object(creator, collection, description, name, uri, property_keys, property_types, property_values);
     }
 
@@ -181,7 +181,7 @@ module quest_star_addr::quest_star_token {
         property_keys: vector<String>,
         property_types: vector<String>,
         property_values: vector<vector<u8>>,
-    ): Object<QuestStarToken> acquires QuestStarCollection, QuestStarToken {
+    ): Object<QuestarToken> acquires QuestarCollection, QuestarToken {
         let constructor_ref = mint_internal(
             creator,
             collection,
@@ -199,9 +199,9 @@ module quest_star_addr::quest_star_token {
         let freezable_by_creator = are_collection_tokens_freezable(collection);
         if (freezable_by_creator) {
             let aptos_token_addr = object::address_from_constructor_ref(&constructor_ref);
-            let quest_star_token = borrow_global_mut<QuestStarToken>(aptos_token_addr);
+            let questar_token = borrow_global_mut<QuestarToken>(aptos_token_addr);
             let transfer_ref = object::generate_transfer_ref(&constructor_ref);
-            option::fill(&mut quest_star_token.transfer_ref, transfer_ref);
+            option::fill(&mut questar_token.transfer_ref, transfer_ref);
         };
 
         object::object_from_constructor_ref(&constructor_ref)
@@ -216,7 +216,7 @@ module quest_star_addr::quest_star_token {
         property_keys: vector<String>,
         property_types: vector<String>,
         property_values: vector<vector<u8>>,
-    ): ConstructorRef acquires QuestStarCollection {
+    ): ConstructorRef acquires QuestarCollection {
         let constructor_ref = token::create(creator, collection, description, name, option::none(), uri);
 
         let object_signer = object::generate_signer(&constructor_ref);
@@ -240,13 +240,13 @@ module quest_star_addr::quest_star_token {
             option::none()
         };
 
-        let quest_star_token = QuestStarToken {
+        let questar_token = QuestarToken {
             burn_ref,
             transfer_ref: option::none(),
             mutator_ref,
             property_mutator_ref: property_map::generate_mutator_ref(&constructor_ref),
         };
-        move_to(&object_signer, quest_star_token);
+        move_to(&object_signer, questar_token);
 
         let properties = property_map::prepare_input(property_keys, property_types, property_values);
         property_map::init(&constructor_ref, properties);
@@ -256,52 +256,52 @@ module quest_star_addr::quest_star_token {
 
     // Token accessors
 
-    inline fun borrow<T: key>(token: &Object<T>): &QuestStarToken {
+    inline fun borrow<T: key>(token: &Object<T>): &QuestarToken {
         let token_address = object::object_address(token);
         assert!(
-            exists<QuestStarToken>(token_address),
+            exists<QuestarToken>(token_address),
             error::not_found(ETOKEN_DOES_NOT_EXIST),
         );
-        borrow_global<QuestStarToken>(token_address)
+        borrow_global<QuestarToken>(token_address)
     }
 
     #[view]
-    public fun are_properties_mutable<T: key>(token: Object<T>): bool acquires QuestStarCollection {
+    public fun are_properties_mutable<T: key>(token: Object<T>): bool acquires QuestarCollection {
         let collection = token::collection_object(token);
         borrow_collection(&collection).mutable_token_properties
     }
 
     #[view]
-    public fun is_burnable<T: key>(token: Object<T>): bool acquires QuestStarToken {
+    public fun is_burnable<T: key>(token: Object<T>): bool acquires QuestarToken {
         option::is_some(&borrow(&token).burn_ref)
     }
 
     #[view]
-    public fun is_freezable_by_creator<T: key>(token: Object<T>): bool acquires QuestStarCollection {
+    public fun is_freezable_by_creator<T: key>(token: Object<T>): bool acquires QuestarCollection {
         are_collection_tokens_freezable(token::collection_object(token))
     }
 
     #[view]
-    public fun is_mutable_description<T: key>(token: Object<T>): bool acquires QuestStarCollection {
+    public fun is_mutable_description<T: key>(token: Object<T>): bool acquires QuestarCollection {
         is_mutable_collection_token_description(token::collection_object(token))
     }
 
     #[view]
-    public fun is_mutable_name<T: key>(token: Object<T>): bool acquires QuestStarCollection {
+    public fun is_mutable_name<T: key>(token: Object<T>): bool acquires QuestarCollection {
         is_mutable_collection_token_name(token::collection_object(token))
     }
 
     #[view]
-    public fun is_mutable_uri<T: key>(token: Object<T>): bool acquires QuestStarCollection {
+    public fun is_mutable_uri<T: key>(token: Object<T>): bool acquires QuestarCollection {
         is_mutable_collection_token_uri(token::collection_object(token))
     }
 
     // Token mutators
 
-    inline fun authorized_borrow<T: key>(token: &Object<T>, creator: &signer): &QuestStarToken {
+    inline fun authorized_borrow<T: key>(token: &Object<T>, creator: &signer): &QuestarToken {
         let token_address = object::object_address(token);
         assert!(
-            exists<QuestStarToken>(token_address),
+            exists<QuestarToken>(token_address),
             error::not_found(ETOKEN_DOES_NOT_EXIST),
         );
 
@@ -309,87 +309,87 @@ module quest_star_addr::quest_star_token {
             token::creator(*token) == signer::address_of(creator),
             error::permission_denied(ENOT_CREATOR),
         );
-        borrow_global<QuestStarToken>(token_address)
+        borrow_global<QuestarToken>(token_address)
     }
 
-    public entry fun burn<T: key>(creator: &signer, token: Object<T>) acquires QuestStarToken {
-        let quest_star_token = authorized_borrow(&token, creator);
+    public entry fun burn<T: key>(creator: &signer, token: Object<T>) acquires QuestarToken {
+        let questar_token = authorized_borrow(&token, creator);
         assert!(
-            option::is_some(&quest_star_token.burn_ref),
+            option::is_some(&questar_token.burn_ref),
             error::permission_denied(ETOKEN_NOT_BURNABLE),
         );
-        move quest_star_token;
-        let quest_star_token = move_from<QuestStarToken>(object::object_address(&token));
-        let QuestStarToken {
+        move questar_token;
+        let questar_token = move_from<QuestarToken>(object::object_address(&token));
+        let QuestarToken {
             burn_ref,
             transfer_ref: _,
             mutator_ref: _,
             property_mutator_ref,
-        } = quest_star_token;
+        } = questar_token;
         property_map::burn(property_mutator_ref);
         token::burn(option::extract(&mut burn_ref));
     }
 
-    public entry fun freeze_transfer<T: key>(creator: &signer, token: Object<T>) acquires QuestStarCollection, QuestStarToken {
-        let quest_star_token = authorized_borrow(&token, creator);
+    public entry fun freeze_transfer<T: key>(creator: &signer, token: Object<T>) acquires QuestarCollection, QuestarToken {
+        let questar_token = authorized_borrow(&token, creator);
         assert!(
             are_collection_tokens_freezable(token::collection_object(token))
-                && option::is_some(&quest_star_token.transfer_ref),
+                && option::is_some(&questar_token.transfer_ref),
             error::permission_denied(EFIELD_NOT_MUTABLE),
         );
-        object::disable_ungated_transfer(option::borrow(&quest_star_token.transfer_ref));
+        object::disable_ungated_transfer(option::borrow(&questar_token.transfer_ref));
     }
 
     public entry fun unfreeze_transfer<T: key>(
         creator: &signer,
         token: Object<T>
-    ) acquires QuestStarCollection, QuestStarToken {
-        let quest_star_token = authorized_borrow(&token, creator);
+    ) acquires QuestarCollection, QuestarToken {
+        let questar_token = authorized_borrow(&token, creator);
         assert!(
             are_collection_tokens_freezable(token::collection_object(token))
-                && option::is_some(&quest_star_token.transfer_ref),
+                && option::is_some(&questar_token.transfer_ref),
             error::permission_denied(EFIELD_NOT_MUTABLE),
         );
-        object::enable_ungated_transfer(option::borrow(&quest_star_token.transfer_ref));
+        object::enable_ungated_transfer(option::borrow(&questar_token.transfer_ref));
     }
 
     public entry fun set_description<T: key>(
         creator: &signer,
         token: Object<T>,
         description: String,
-    ) acquires QuestStarCollection, QuestStarToken {
+    ) acquires QuestarCollection, QuestarToken {
         assert!(
             is_mutable_description(token),
             error::permission_denied(EFIELD_NOT_MUTABLE),
         );
-        let quest_star_token = authorized_borrow(&token, creator);
-        token::set_description(option::borrow(&quest_star_token.mutator_ref), description);
+        let questar_token = authorized_borrow(&token, creator);
+        token::set_description(option::borrow(&questar_token.mutator_ref), description);
     }
 
     public entry fun set_name<T: key>(
         creator: &signer,
         token: Object<T>,
         name: String,
-    ) acquires QuestStarCollection, QuestStarToken {
+    ) acquires QuestarCollection, QuestarToken {
         assert!(
             is_mutable_name(token),
             error::permission_denied(EFIELD_NOT_MUTABLE),
         );
-        let quest_star_token = authorized_borrow(&token, creator);
-        token::set_name(option::borrow(&quest_star_token.mutator_ref), name);
+        let questar_token = authorized_borrow(&token, creator);
+        token::set_name(option::borrow(&questar_token.mutator_ref), name);
     }
 
     public entry fun set_uri<T: key>(
         creator: &signer,
         token: Object<T>,
         uri: String,
-    ) acquires QuestStarCollection, QuestStarToken {
+    ) acquires QuestarCollection, QuestarToken {
         assert!(
             is_mutable_uri(token),
             error::permission_denied(EFIELD_NOT_MUTABLE),
         );
-        let quest_star_token = authorized_borrow(&token, creator);
-        token::set_uri(option::borrow(&quest_star_token.mutator_ref), uri);
+        let questar_token = authorized_borrow(&token, creator);
+        token::set_uri(option::borrow(&questar_token.mutator_ref), uri);
     }
 
     public entry fun add_property<T: key>(
@@ -398,14 +398,14 @@ module quest_star_addr::quest_star_token {
         key: String,
         type: String,
         value: vector<u8>,
-    ) acquires QuestStarCollection, QuestStarToken {
-        let quest_star_token = authorized_borrow(&token, creator);
+    ) acquires QuestarCollection, QuestarToken {
+        let questar_token = authorized_borrow(&token, creator);
         assert!(
             are_properties_mutable(token),
             error::permission_denied(EPROPERTIES_NOT_MUTABLE),
         );
 
-        property_map::add(&quest_star_token.property_mutator_ref, key, type, value);
+        property_map::add(&questar_token.property_mutator_ref, key, type, value);
     }
 
     public entry fun add_typed_property<T: key, V: drop>(
@@ -413,28 +413,28 @@ module quest_star_addr::quest_star_token {
         token: Object<T>,
         key: String,
         value: V,
-    ) acquires QuestStarCollection, QuestStarToken {
-        let quest_star_token = authorized_borrow(&token, creator);
+    ) acquires QuestarCollection, QuestarToken {
+        let questar_token = authorized_borrow(&token, creator);
         assert!(
             are_properties_mutable(token),
             error::permission_denied(EPROPERTIES_NOT_MUTABLE),
         );
 
-        property_map::add_typed(&quest_star_token.property_mutator_ref, key, value);
+        property_map::add_typed(&questar_token.property_mutator_ref, key, value);
     }
 
     public entry fun remove_property<T: key>(
         creator: &signer,
         token: Object<T>,
         key: String,
-    ) acquires QuestStarCollection, QuestStarToken {
-        let quest_star_token = authorized_borrow(&token, creator);
+    ) acquires QuestarCollection, QuestarToken {
+        let questar_token = authorized_borrow(&token, creator);
         assert!(
             are_properties_mutable(token),
             error::permission_denied(EPROPERTIES_NOT_MUTABLE),
         );
 
-        property_map::remove(&quest_star_token.property_mutator_ref, &key);
+        property_map::remove(&questar_token.property_mutator_ref, &key);
     }
 
     public entry fun update_property<T: key>(
@@ -443,14 +443,14 @@ module quest_star_addr::quest_star_token {
         key: String,
         type: String,
         value: vector<u8>,
-    ) acquires QuestStarCollection, QuestStarToken {
-        let quest_star_token = authorized_borrow(&token, creator);
+    ) acquires QuestarCollection, QuestarToken {
+        let questar_token = authorized_borrow(&token, creator);
         assert!(
             are_properties_mutable(token),
             error::permission_denied(EPROPERTIES_NOT_MUTABLE),
         );
 
-        property_map::update(&quest_star_token.property_mutator_ref, &key, type, value);
+        property_map::update(&questar_token.property_mutator_ref, &key, type, value);
     }
 
     public entry fun update_typed_property<T: key, V: drop>(
@@ -458,106 +458,106 @@ module quest_star_addr::quest_star_token {
         token: Object<T>,
         key: String,
         value: V,
-    ) acquires QuestStarCollection, QuestStarToken {
-        let quest_star_token = authorized_borrow(&token, creator);
+    ) acquires QuestarCollection, QuestarToken {
+        let questar_token = authorized_borrow(&token, creator);
         assert!(
             are_properties_mutable(token),
             error::permission_denied(EPROPERTIES_NOT_MUTABLE),
         );
 
-        property_map::update_typed(&quest_star_token.property_mutator_ref, &key, value);
+        property_map::update_typed(&questar_token.property_mutator_ref, &key, value);
     }
 
     // Collection accessors
 
-    inline fun collection_object(creator: &signer, name: &String): Object<QuestStarCollection> {
+    inline fun collection_object(creator: &signer, name: &String): Object<QuestarCollection> {
         let collection_addr = collection::create_collection_address(&signer::address_of(creator), name);
-        object::address_to_object<QuestStarCollection>(collection_addr)
+        object::address_to_object<QuestarCollection>(collection_addr)
     }
 
-    inline fun borrow_collection<T: key>(token: &Object<T>): &QuestStarCollection {
+    inline fun borrow_collection<T: key>(token: &Object<T>): &QuestarCollection {
         let collection_address = object::object_address(token);
         assert!(
-            exists<QuestStarCollection>(collection_address),
+            exists<QuestarCollection>(collection_address),
             error::not_found(ECOLLECTION_DOES_NOT_EXIST),
         );
-        borrow_global<QuestStarCollection>(collection_address)
+        borrow_global<QuestarCollection>(collection_address)
     }
 
     public fun is_mutable_collection_description<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         borrow_collection(&collection).mutable_description
     }
 
     public fun is_mutable_collection_royalty<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         option::is_some(&borrow_collection(&collection).royalty_mutator_ref)
     }
 
     public fun is_mutable_collection_uri<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         borrow_collection(&collection).mutable_uri
     }
 
     public fun is_mutable_collection_token_description<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         borrow_collection(&collection).mutable_token_description
     }
 
     public fun is_mutable_collection_token_name<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         borrow_collection(&collection).mutable_token_name
     }
 
     public fun is_mutable_collection_token_uri<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         borrow_collection(&collection).mutable_token_uri
     }
 
     public fun is_mutable_collection_token_properties<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         borrow_collection(&collection).mutable_token_properties
     }
 
     public fun are_collection_tokens_burnable<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         borrow_collection(&collection).tokens_burnable_by_creator
     }
 
     public fun are_collection_tokens_freezable<T: key>(
         collection: Object<T>,
-    ): bool acquires QuestStarCollection {
+    ): bool acquires QuestarCollection {
         borrow_collection(&collection).tokens_freezable_by_creator
     }
 
     // Collection mutators
 
-    inline fun authorized_borrow_collection<T: key>(collection: &Object<T>, creator: &signer): &QuestStarCollection {
+    inline fun authorized_borrow_collection<T: key>(collection: &Object<T>, creator: &signer): &QuestarCollection {
         let collection_address = object::object_address(collection);
         assert!(
-            exists<QuestStarCollection>(collection_address),
+            exists<QuestarCollection>(collection_address),
             error::not_found(ECOLLECTION_DOES_NOT_EXIST),
         );
         assert!(
             collection::creator(*collection) == signer::address_of(creator),
             error::permission_denied(ENOT_CREATOR),
         );
-        borrow_global<QuestStarCollection>(collection_address)
+        borrow_global<QuestarCollection>(collection_address)
     }
 
     public entry fun set_collection_description<T: key>(
         creator: &signer,
         collection: Object<T>,
         description: String,
-    ) acquires QuestStarCollection {
+    ) acquires QuestarCollection {
         let aptos_collection = authorized_borrow_collection(&collection, creator);
         assert!(
             aptos_collection.mutable_description,
@@ -570,7 +570,7 @@ module quest_star_addr::quest_star_token {
         creator: &signer,
         collection: Object<T>,
         royalty: royalty::Royalty,
-    ) acquires QuestStarCollection {
+    ) acquires QuestarCollection {
         let aptos_collection = authorized_borrow_collection(&collection, creator);
         assert!(
             option::is_some(&aptos_collection.royalty_mutator_ref),
@@ -585,7 +585,7 @@ module quest_star_addr::quest_star_token {
         royalty_numerator: u64,
         royalty_denominator: u64,
         payee_address: address,
-    ) acquires QuestStarCollection {
+    ) acquires QuestarCollection {
         let royalty = royalty::create(royalty_numerator, royalty_denominator, payee_address);
         set_collection_royalties(creator, collection, royalty);
     }
@@ -594,7 +594,7 @@ module quest_star_addr::quest_star_token {
         creator: &signer,
         collection: Object<T>,
         uri: String,
-    ) acquires QuestStarCollection {
+    ) acquires QuestarCollection {
         let aptos_collection = authorized_borrow_collection(&collection, creator);
         assert!(
             aptos_collection.mutable_uri,
@@ -611,7 +611,7 @@ module quest_star_addr::quest_star_token {
     use aptos_framework::account;
 
     #[test(creator = @0x123)]
-    fun test_create_and_transfer(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_create_and_transfer(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -625,7 +625,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123, bob = @0x456)]
     #[expected_failure(abort_code = 0x50003, location = object)]
-    fun test_mint_soul_bound(creator: &signer, bob: &signer) acquires QuestStarCollection {
+    fun test_mint_soul_bound(creator: &signer, bob: &signer) acquires QuestarCollection {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -651,7 +651,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123)]
     #[expected_failure(abort_code = 0x50003, location = object)]
-    fun test_frozen_transfer(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_frozen_transfer(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -662,7 +662,7 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_unfrozen_transfer(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_unfrozen_transfer(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -675,7 +675,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123, another = @0x456)]
     #[expected_failure(abort_code = 0x50003, location = Self)]
-    fun test_noncreator_freeze(creator: &signer, another: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_noncreator_freeze(creator: &signer, another: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -686,7 +686,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123, another = @0x456)]
     #[expected_failure(abort_code = 0x50003, location = Self)]
-    fun test_noncreator_unfreeze(creator: &signer, another: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_noncreator_unfreeze(creator: &signer, another: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -697,7 +697,7 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_set_description(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_set_description(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -712,7 +712,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123)]
     #[expected_failure(abort_code = 0x50004, location = Self)]
-    fun test_set_immutable_description(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_set_immutable_description(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -727,7 +727,7 @@ module quest_star_addr::quest_star_token {
     fun test_set_description_non_creator(
         creator: &signer,
         noncreator: &signer,
-    ) acquires QuestStarCollection, QuestStarToken {
+    ) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -739,7 +739,7 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_set_name(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_set_name(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -754,7 +754,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123)]
     #[expected_failure(abort_code = 0x50004, location = Self)]
-    fun test_set_immutable_name(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_set_immutable_name(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -769,7 +769,7 @@ module quest_star_addr::quest_star_token {
     fun test_set_name_non_creator(
         creator: &signer,
         noncreator: &signer,
-    ) acquires QuestStarCollection, QuestStarToken {
+    ) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -781,7 +781,7 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_set_uri(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_set_uri(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -796,7 +796,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123)]
     #[expected_failure(abort_code = 0x50004, location = Self)]
-    fun test_set_immutable_uri(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_set_immutable_uri(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -811,7 +811,7 @@ module quest_star_addr::quest_star_token {
     fun test_set_uri_non_creator(
         creator: &signer,
         noncreator: &signer,
-    ) acquires QuestStarCollection, QuestStarToken {
+    ) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -823,7 +823,7 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_burnable(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_burnable(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -831,14 +831,14 @@ module quest_star_addr::quest_star_token {
         let token = mint_helper(creator, collection_name, token_name);
         let token_addr = object::object_address(&token);
 
-        assert!(exists<QuestStarToken>(token_addr), 0);
+        assert!(exists<QuestarToken>(token_addr), 0);
         burn(creator, token);
-        assert!(!exists<QuestStarToken>(token_addr), 1);
+        assert!(!exists<QuestarToken>(token_addr), 1);
     }
 
     #[test(creator = @0x123)]
     #[expected_failure(abort_code = 0x50005, location = Self)]
-    fun test_not_burnable(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_not_burnable(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -853,7 +853,7 @@ module quest_star_addr::quest_star_token {
     fun test_burn_non_creator(
         creator: &signer,
         noncreator: &signer,
-    ) acquires QuestStarCollection, QuestStarToken {
+    ) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -864,7 +864,7 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_set_collection_description(creator: &signer) acquires QuestStarCollection {
+    fun test_set_collection_description(creator: &signer) acquires QuestarCollection {
         let collection_name = string::utf8(b"collection name");
         let collection = create_collection_helper(creator, collection_name, true);
         let value = string::utf8(b"not");
@@ -875,7 +875,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123)]
     #[expected_failure(abort_code = 0x50004, location = Self)]
-    fun test_set_immutable_collection_description(creator: &signer) acquires QuestStarCollection {
+    fun test_set_immutable_collection_description(creator: &signer) acquires QuestarCollection {
         let collection_name = string::utf8(b"collection name");
         let collection = create_collection_helper(creator, collection_name, false);
         set_collection_description(creator, collection, string::utf8(b""));
@@ -886,14 +886,14 @@ module quest_star_addr::quest_star_token {
     fun test_set_collection_description_non_creator(
         creator: &signer,
         noncreator: &signer,
-    ) acquires QuestStarCollection {
+    ) acquires QuestarCollection {
         let collection_name = string::utf8(b"collection name");
         let collection = create_collection_helper(creator, collection_name, true);
         set_collection_description(noncreator, collection, string::utf8(b""));
     }
 
     #[test(creator = @0x123)]
-    fun test_set_collection_uri(creator: &signer) acquires QuestStarCollection {
+    fun test_set_collection_uri(creator: &signer) acquires QuestarCollection {
         let collection_name = string::utf8(b"collection name");
         let collection = create_collection_helper(creator, collection_name, true);
         let value = string::utf8(b"not");
@@ -904,7 +904,7 @@ module quest_star_addr::quest_star_token {
 
     #[test(creator = @0x123)]
     #[expected_failure(abort_code = 0x50004, location = Self)]
-    fun test_set_immutable_collection_uri(creator: &signer) acquires QuestStarCollection {
+    fun test_set_immutable_collection_uri(creator: &signer) acquires QuestarCollection {
         let collection_name = string::utf8(b"collection name");
         let collection = create_collection_helper(creator, collection_name, false);
         set_collection_uri(creator, collection, string::utf8(b""));
@@ -915,14 +915,14 @@ module quest_star_addr::quest_star_token {
     fun test_set_collection_uri_non_creator(
         creator: &signer,
         noncreator: &signer,
-    ) acquires QuestStarCollection {
+    ) acquires QuestarCollection {
         let collection_name = string::utf8(b"collection name");
         let collection = create_collection_helper(creator, collection_name, true);
         set_collection_uri(noncreator, collection, string::utf8(b""));
     }
 
     #[test(creator = @0x123)]
-    fun test_property_add(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_property_add(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
         let property_name = string::utf8(b"u8");
@@ -936,20 +936,20 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_property_typed_add(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_property_typed_add(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
         let property_name = string::utf8(b"u8");
 
         create_collection_helper(creator, collection_name, true);
         let token = mint_helper(creator, collection_name, token_name);
-        add_typed_property<QuestStarToken, u8>(creator, token, property_name, 0x8);
+        add_typed_property<QuestarToken, u8>(creator, token, property_name, 0x8);
 
         assert!(property_map::read_u8(&token, &property_name) == 0x8, 0);
     }
 
     #[test(creator = @0x123)]
-    fun test_property_update(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_property_update(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
         let property_name = string::utf8(b"bool");
@@ -963,20 +963,20 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_property_update_typed(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_property_update_typed(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
         let property_name = string::utf8(b"bool");
 
         create_collection_helper(creator, collection_name, true);
         let token = mint_helper(creator, collection_name, token_name);
-        update_typed_property<QuestStarToken, bool>(creator, token, property_name, false);
+        update_typed_property<QuestarToken, bool>(creator, token, property_name, false);
 
         assert!(!property_map::read_bool(&token, &property_name), 0);
     }
 
     #[test(creator = @0x123)]
-    fun test_property_remove(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_property_remove(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
         let property_name = string::utf8(b"bool");
@@ -987,7 +987,7 @@ module quest_star_addr::quest_star_token {
     }
 
     #[test(creator = @0x123)]
-    fun test_royalties(creator: &signer) acquires QuestStarCollection, QuestStarToken {
+    fun test_royalties(creator: &signer) acquires QuestarCollection, QuestarToken {
         let collection_name = string::utf8(b"collection name");
         let token_name = string::utf8(b"token name");
 
@@ -1005,7 +1005,7 @@ module quest_star_addr::quest_star_token {
         creator: &signer,
         collection_name: String,
         flag: bool,
-    ): Object<QuestStarCollection> {
+    ): Object<QuestarCollection> {
         create_collection_object(
             creator,
             string::utf8(b"collection description"),
@@ -1031,7 +1031,7 @@ module quest_star_addr::quest_star_token {
         creator: &signer,
         collection_name: String,
         token_name: String,
-    ): Object<QuestStarToken> acquires QuestStarCollection, QuestStarToken {
+    ): Object<QuestarToken> acquires QuestarCollection, QuestarToken {
         let creator_addr = signer::address_of(creator);
         account::create_account_for_test(creator_addr);
 

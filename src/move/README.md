@@ -1,4 +1,4 @@
-# QuestStarNFT
+# QuestarNFT
 
 ## Compile
 
@@ -9,11 +9,11 @@ aptos move compile
 or
 
 ```sh
-aptos move compile --named-addresses quest_star_addr=<profile name>
+aptos move compile --named-addresses questar_addr=<profile name>
 ```
 
 ## Deploy
 
 ```sh
-aptos move publish --named-addresses quest_star_addr=<profile name> --profile=<profile name>
+aptos move publish --named-addresses questar_addr=<profile name> --profile=<profile name>
 ```
