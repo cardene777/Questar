@@ -37,6 +37,39 @@
 - Users receive points (tokens) for completing tasks, and NFTs can be issued once a certain number has been accumulated, so motivation is generated, such as completing tasks to draw gachas.
 - Consideration is also given to stimulating the desire to collect NFTs by issuing NFTs in collaboration with companies.
 
+## Tasks.
+
+The following tasks are currently planned to be implemented
+
+- Liking specific posts on Twitter
+- Retweeting specific posts on Twitter
+- Joining specific servers on Discord
+- Getting a role on a specific server on Discord
+- Quiz.
+- Number of native tokens held by a specific chain
+- Number of specific NFTs held by a specific chain
+- Holding of specific NFTs of a specific chain?
+- Duration of holding of specified NFTs in specified chain
+- Return value from a specific function in a specific contract of a specific chain
+- Number of transactions in the specified chain
+- Number of transactions in a specific contract of a specific chain
+- Number of transactions in a specific period of time in a specific chain
+
+
+Tasks to be added include.
+
+- Farcaster-related (researching which data would be most suitable).
+
+## Post-aggregation actions.
+
+The following actions will be implemented after the tasks have been completed and aggregated.
+
+- NFT distribution.
+- Distribution of native tokens.
+- Distribution of ERC20 tokens.
+- Distribution of SBTs.
+- Distribution of points
+
 ## Concerns.
 
 ### Certain projects issue too many campaign tasks.
