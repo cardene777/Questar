@@ -1,6 +1,6 @@
 # Development Roadmap
 
-- [ ] Solidity implementation of ERC404.
+- [x] Solidity implementation of ERC404.
 - [ ] Rewriting the ERC404 implementation into the Move language.
 - [ ] Front-end creation.
 - [ ] Task implementation.

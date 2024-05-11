@@ -17,34 +17,29 @@ import {
 
 const components: { title: string; href: string; description: string }[] = [
   {
-    title: "Artist",
-    href: "/docs/primitives/alert-dialog",
-    description: "Artist.",
+    title: "Docs",
+    href: "/docs",
+    description: "Docs.",
   },
   {
-    title: "Engineer",
-    href: "/docs/primitives/hover-card",
-    description: "Engineer.",
+    title: "Blog",
+    href: "/blog",
+    description: "Blog.",
   },
   {
-    title: "Youtuber",
-    href: "/docs/primitives/progress",
-    description: "Youtuber.",
+    title: "Help Center",
+    href: "/help",
+    description: "Help Center.",
   },
   {
-    title: "Influencer",
-    href: "/docs/primitives/scroll-area",
-    description: "Influencer.",
+    title: "Contact",
+    href: "/contact",
+    description: "Contact.",
   },
   {
-    title: "Blogger",
-    href: "/docs/primitives/tabs",
-    description: "Blogger.",
-  },
-  {
-    title: "Podcaster",
-    href: "/docs/primitives/tooltip",
-    description: "Podcaster.",
+    title: "How to Create",
+    href: "/create",
+    description: "How to Create.",
   },
 ];
 
@@ -53,39 +48,45 @@ export function Navigation() {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Start Cheer</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Questar</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[1000px] lg:grid-cols-[.75fr_1fr]">
               <li className="row-span-3">
                 <NavigationMenuLink asChild>
                   <a
-                    className="flex h-full w-full select-none flex-col rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md justify-center items-center"
+                    className="flex h-full w-full select-none flex-col rounded-md bg-gradient-to-b from-muted/50 to-muted p-3 no-underline outline-none focus:shadow-md justify-center items-center"
                     href="/"
                   >
-                    {/* <Icons.logo className="h-6 w-6" /> */}
                     <div className="mb-2 mt-4 text-lg font-medium">
-                      Cheer Wave?
+                      What is Questar?
                     </div>
                     <Image
-                      src="/assets/images/cheer_wave/cheer_wave_logo.png"
+                      src="/assets/images/questar/questar.png"
                       alt="Logo"
-                      width={100}
+                      width={80}
                       height={80}
                     />
                   </a>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="/docs" title="Patron Ranking">
-                Ranking dashboard for amount and number of support.
+              <ListItem href="/task" title="Tasks">
+                List of tasks that can be created
               </ListItem>
-              <ListItem href="/docs/installation" title="Contents Creator">
+              <ListItem href="/sponser" title="Sponsors">
                 List of Content Creators.
               </ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Category</NavigationMenuTrigger>
+          <Link href="/docs" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Earn
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
               {components.map((component) => (
@@ -99,13 +100,6 @@ export function Navigation() {
               ))}
             </ul>
           </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link href="/docs" legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Documentation
-            </NavigationMenuLink>
-          </Link>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
